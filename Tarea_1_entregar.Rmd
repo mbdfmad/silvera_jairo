@@ -1,0 +1,405 @@
+---
+title: "Tarea_1"
+author: "Jairo Silvera"
+date: "14/9/2021"
+output: pdf_document
+---
+
+```{r setup, include= FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(tidyverse)
+```
+
+```{r}
+## leer dataset ##
+
+chlstrl <-read.csv("cholesterol.csv")
+chlstrl <-data.frame(chlstrl)
+
+## informacion del dataframe
+str(chlstrl) # 403 observaciones y 19 variables
+```
+
+# Informacion de variables
+```{r}
+names(chlstrl)
+```
+
+```{r}
+dim(chlstrl)
+```
+
+
+```{r}
+na <- is.na(chlstrl)
+na
+```
+# suma de na's
+```{r}
+sum(is.na(chlstrl))
+```
+# porcentaje de na's
+```{r}
+sum(is.na(chlstrl)) / length(chlstrl)
+```
+
+
+# variables categoricas
+```{r}
+table(chlstrl$location)
+```
+# variables categoricas y frecuencias
+```{r}
+table(chlstrl$location, chlstrl$frame)
+```
+```{r}
+table(chlstrl$location)
+```
+
+# proporciones de las variables categoricas
+```{r}
+prop.table(table(chlstrl$location, chlstrl$frame))
+```
+
+# usando describe() en el dataframe
+```{r}
+library(Hmisc)
+describe(chlstrl)
+```
+```{r}
+barplot(table(chlstrl$location), main= "Locations", xlab = "Locaciones", ylab = "Frecuencia", col = "steelblue")
+```
+```{r}
+pie(table(chlstrl$location), col = c("red", "blue"),
+    main = "Locaciones")
+```
+
+
+```{r}
+barplot(table(chlstrl$frame), main= "Frame", xlab = "tipo de frames", ylab = "Frecuencia", col = "steelblue")
+```
+ # variables cuantitativas
+```{r}
+summary(chlstrl)
+```
+# factorizando variables
+```{r}
+chlstrl$location <- factor(chlstrl$location)
+chlstrl$frame <- factor(chlstrl$frame)
+```
+
+
+
+```{r}
+summary(chlstrl$chol)
+```
+# Na's reemplazados por 0
+```{r}
+chlstrl <- chlstrl %>%
+   mutate(chol = replace(chol,is.na(chol),0))
+```
+
+```{r}
+chlstrl <-  chlstrl %>%
+   mutate(glyhb = replace(glyhb,is.na(glyhb),0))
+```
+
+```{r}
+media <- mean(chlstrl$chol)
+paste("La media de la variable chol es", media)
+```
+
+```{r}
+media <- mean(chlstrl$glyhb)
+paste("La media de la variable glyhb es", media)
+```
+# grupo por locacion variables chol y glyhb
+```{r}
+grupo <- chlstrl %>%
+  group_by(location) %>%
+  summarise(chol_mean=mean(chol),
+            gly_mean=mean(glyhb))
+paste("Grupo es",grupo)
+```
+# graficos
+```{r}
+ggplot(data = chlstrl, mapping = aes(x = chol)) +
+  geom_histogram(binwidth = 0.6)
+```
+# graficos
+```{r}
+ggplot(data=chlstrl, aes(chol, glyhb)) + geom_point()
+```
+
+```{r}
+grafico <- ggplot(chlstrl, aes(x = gender)) + geom_bar(width=0.5)
+grafico + xlab("Genero") + ylab ("Count") + 
+  ggtitle("Grafico")
+```
+
+# Convirtiendo na's en columnas weigth y heigth
+```{r}
+chlstrl <- chlstrl %>%
+   mutate(weight = replace(weight,is.na(height),0))
+```
+# Cerificando na's
+```{r}
+sum(is.na(chlstrl$height))
+sum(is.na(chlstrl$weight))
+
+```
+# Convirtiendo variables a Kg y Mts
+```{r}
+
+chlstrl %>%
+  select(height, weight) %>%
+  mutate(
+    height = height * 0.0254,
+    weight = weight * 0.454)
+    
+```
+
+```{r}
+dim(chlstrl)
+```
+# Columna BMI
+```{r}
+chlstrl %>%
+  select(height, weight) %>%
+  mutate(chlstrl, BMI = weight / height^2)
+```
+
+# Crea una función de R llamada cambiosSigno que recibe un vector
+```{r}
+cambiosSigno <- function(vect){
+  salida1 <- abs(vect)
+  z <-as.numeric(salida1 %in% vect)
+  c(list(salida1, z, length(z[z==FALSE])))
+  }
+(vect <-sample(-5:15, 10, replace = F))
+cambiosSigno(vect)
+```
+
+# Modifica la función para que devuelva como resultado las posiciones donde hay cambios de signo Funcion cambiosSignoPos
+```{r}
+cambiosSignoPos <- function(vect){
+  salida1 <- abs(vect)
+  z <-as.numeric(salida1 %in% vect)
+  names(z) <- 1:length(z)
+  w <- z[!is.na(z)] 
+  names(w[c(1,length(w))])
+  c(list(salida1, z))
+  
+}
+(vect <-sample(-5:15, 10, replace = F))
+cambiosSignoPos(vect)
+```
+
+# ejercicio 6 de la seccion 3.6.1 del libro R4Ds
+# a
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+#b
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_smooth(aes(group = drv), se = FALSE) +
+  geom_point()
+```
+
+#c
+```{r}
+#c
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+#d
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(aes(color = drv)) +
+  geom_smooth(se = FALSE)
+```
+#e
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(aes(color = drv)) +
+  geom_smooth(aes(linetype = drv), se = FALSE)
+```
+#f
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(size = 4, colour = "white") +
+  geom_point(aes(colour = drv))
+```
+# ejercicio 1 de la seccion 5.2.4 del libro R4Ds
+#1 Tuvieron un retraso de llegada de dos o más horas
+```{r}
+library(nycflights13)
+library(tidyverse)
+flights %>% 
+  filter(arr_delay >= 120)
+  
+```
+
+#2 Volaron a Houston (`IAH` o` HOU`)
+```{r}
+flights %>% 
+  filter(dest %in% c("IAH", "HOU"))
+```
+
+#3 Fueron operados por United, American o Delta
+```{r}
+flights %>% 
+  filter(carrier %in% c("UA", "AA", "DL"))
+```
+
+#4 Partieron en el invierno del hemisferio sur (julio, agosto y septiembre)
+```{r}
+flights %>% 
+  filter(month %in%  c(7, 8, 9))
+```
+
+#5 Llegaron más de dos horas tarde, pero no salieron tarde
+```{r}
+flights %>% 
+  filter(arr_delay <= 0 & dep_delay > 120)
+```
+
+#6 Se retrasaron por lo menos una hora, pero repusieron más de 30 minutos en vuelo
+```{r}
+flights %>% 
+  filter(arr_delay >= 60 & arr_delay - dep_delay > 30)
+```
+
+#7 Partieron entre la medianoche y las 6 a.m. (incluyente)
+```{r}
+flights %>% 
+  filter(dep_time %in% c(1:600) | dep_time == 2400)
+```
+
+# practica 0
+# dado honesto
+```{r}
+dado_honesto = sample(1:6, size = 100, replace = TRUE)
+dado_honesto
+```
+# tabla frecuencia abosulta
+```{r}
+library(dplyr)
+table(dado_honesto)
+```
+
+# frecuencia absoluta dplyr
+```{r}
+tabla <- as.data.frame(table(dado_honesto))
+tabla
+```
+
+# frecuencia relativa
+```{r}
+transform(tabla,
+          frec_acum = cumsum(Freq),
+          fre_rel = round(prop.table(Freq), 3),
+          rel_acum = round(cumsum(prop.table(Freq)), 3))
+```
+
+# vector dado_cargado
+```{r}
+dado_cargado = sample(1:6, size = 100, replace = TRUE, prob = c(1,1,1,1,1, 2))
+dado_cargado
+```
+# tabla frecuencia abosulta dado_cargado
+```{r}
+dc = table(dado_cargado)
+dc
+```
+
+# frecuencia absoluta dplyr dado_cargado
+```{r}
+tabla_dc <- as.data.frame(table(dado_cargado))
+tabla_dc
+```
+
+# frecuencia relativa dado_cargado
+```{r}
+transform(tabla_dc,
+          frec_acum = cumsum(Freq),
+          fre_rel = round(prop.table(Freq), 4),
+          rel_acum = round(cumsum(prop.table(Freq)), 4))
+```
+
+# rep y seq para crear tres vectores v1, v2 y v3
+```{r}
+x0 <-rep(4,4)
+x1 <-rep(3,4)
+x2 <-rep(2,4)
+x3 <-rep(1,4)
+v1 = c(x0, x1, x2, x3)
+v1
+```
+# vector v2
+```{r}
+v2<-rep(1:5, c(1,2,3,4,5))
+v2
+```
+# vector v3
+```{r}
+
+v3<-rep(1:4, time=4)
+v3
+```
+# Utilizando la tabla mpg de la librer?a tidyverse crea una tabla mpg2
+```{r}
+mpg2 = table(mpg$class)
+mpg2 <- select(mpg, class)
+mpg2 %>% select(starts_with("c"))
+mpg %>% select(starts_with("c"))
+```
+
+# Archivo census data importar el archivo y averiguar el tipo de archivo
+```{r}
+library(haven)
+census <- read_dta("census.dta")
+head(census)
+str(census)
+df2 <-data.frame(census)
+df2
+```
+
+# Poblaciones totales por region
+```{r}
+census  %>%
+  group_by(census$region)  %>%
+  summarise(suma=sum(pop))
+```
+
+# Orden descendente mayor - menor pop
+```{r}
+census %>%
+  arrange(desc(pop))
+```
+
+# Nueva variable divorcio / matrimonio
+```{r}
+mat_div=census %>%
+  select(state,marriage,divorce) %>%
+  mutate(marriage,divorce,mat_div=divorce/marriage) %>%
+```
+
+
+
+
+
+
+
+
