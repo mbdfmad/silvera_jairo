@@ -1,0 +1,162 @@
+---
+title: "Tare_2_entregar"
+author: "Jairo Silvera"
+date: "24/9/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+```
+
+# Ejercicio 1. Simulando variables aleatorias discretas
+# Apartado 1: La variable aleatoria discreta $X1$ tiene esta tabla de densidad de probabilidad (es la variable que se usa como ejemplo en la Sesión ):
+
+```{r}
+#media
+mean(64/125, 48/125, 12/125, 1/125)
+vec_vac = c(64/125, 48/125, 12/125, 1/125)
+vec_vac
+# Varianza
+var(vec_vac)
+```
+# Apartado 2: Combina sample con replicate para simular cien  mil
+
+```{r}
+k = 100000
+n = 10
+media = replicate(k, {
+  muestra = sample(vec_vac, n, replace=TRUE)
+  mean(muestra) # 
+})
+mean(muestra, na.rm = FALSE) 
+summary(media)
+
+```
+
+# Graficos
+```{r}
+hist(media)
+legend("topright",
+       paste("No de muestras = ", k,
+             "\nTamaño de muestra = ",n),
+       bty = "n", cex = 0.7)
+```
+
+
+```{r}
+ggplot() + 
+  geom_histogram(aes(x = media), bins = 15, fill="orange", color="black") + 
+  geom_vline(xintercept = mean(muestra), 
+             col="blue", linetype="dashed", size=2)
+```
+
+# tamaño a 30
+
+```{r}
+n = 30
+media = replicate(k, {
+  muestra = sample(vec_vac, n, replace=TRUE)
+  mean(muestra) # 
+})
+mean(muestra, na.rm = FALSE)
+summary(media)
+
+```
+
+# graficos
+```{r}
+hist(media)
+legend("topright",
+       paste("No de muestras = ", k,
+             "\nTama?o de muestra = ",n),
+       bty = "n", cex = 0.7)
+```
+
+```{r}
+ggplot() + 
+  geom_histogram(aes(x = media), bins = 15, fill="orange", color="black") + 
+  geom_vline(xintercept = mean(muestra), 
+             col="blue", linetype="dashed", size=2)
+```
+
+
+# Apartado 3: La variable aleatoria discreta $X2$ tiene esta tabla de densidad de probabilidad:
+
+```{r}
+# P(X1 y X2) = P(X1) * P(X2)
+x1 = c(64/125, 48/125, 12/125)
+x2 = c(1/2, 1/4, 1/4)
+prob = x1 * x2
+```
+
+# apartado 4 calcula la media teorica de x1 + x2
+```{r}
+media_c = mean(64/125, 48/125, 12/125, 1/2, 1/4, 1/4)
+media_c
+```
+
+```{r}
+k=1000
+media_m = replicate(k, {
+  muestra = sample(media_c, replace = TRUE)
+  mean(muestra)
+})
+head(media_m, 10)
+```
+
+# Ejercicio 2. Datos limpios - descargar dichero testResults.csv
+```{r}
+test_results <- read.csv("testResults.csv")
+# Cada variable debe tener su propia columna.
+# Cada observacion debe tener su propia fila.
+# Cada valor debe tener su propia celda.
+# agrupando por nombre
+test_results %>% 
+  group_by(name, id) %>% 
+  summarise(count=n())
+# count
+test_results %>% 
+  count(name, wt=test_number )
+# funcion separate
+test_results %>% 
+  separate(gender_age, into= c("gender", "age"))
+# EL dataset queda limpio con utilizando la funcion separate()
+# no es necesario hacer mas tidy puesto se debe indicar el  
+# number_test que es 1 0 2 y el numero de tests para cada semana
+# y por cada nombre de estudiante se debe diferenciar el numero de  
+# tests que realizó por cada semana
+
+```
+
+# ejercicio 3
+# ejercicio 4 de la seccion 12.6.1 del libro R4ds
+```{r}
+data %>%
+  group_by(country, year, sex) %>%
+  summarise(cases = sum(cases)) %>%
+  unite(country_sex, country, sex, remove = FALSE) %>%
+  ggplot(aes(x = year, y = cases, group = country_sex, colour = sex)) +
+  geom_line()
+```
+
+# ejercicio 2 de la Sección 7.5.1.1 del libro R4DS
+```{r}
+# ¿Qué variable del conjunto de datos de diamantes es más importante para predecir el precio de un diamante?
+# La variable cut puesto indica el estado del diamante por ende su precio, la vaeiable carat tambien determina e precio del diamante
+# ¿Cómo está correlacionada esta variable con el corte?
+# a mejor corte eñ precio sera mas elevado
+# ¿Por qué la combinación de estas dos relaciones conlleva que los diamantes de menor calidad sean más costosos?
+# hay que tener en cuenta tambien que el ancho width del diamante tambien es importante
+
+
+```
+
